@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Зрозуміле вікно — калькулятор для старших користувачів</title>
+    <style>
+      :root {
+        font-family: Arial, Helvetica, sans-serif;
+        color: #172b3c;
+        background: #f4f6f8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 4px solid #f8b629;
+        outline-offset: 3px;
+      }
+      header {
+        background: #124469;
+        color: white;
+        padding: 18px 7%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      header strong {
+        font-size: 26px;
+      }
+      .tag {
+        font-size: 16px;
+        font-weight: 700;
+        color: #d7eaff;
+      }
+      main {
+        max-width: 1100px;
+        margin: 32px auto;
+        padding: 0 24px;
+      }
+      .backlink {
+        display: inline-block;
+        color: #114c78;
+        font-size: 18px;
+        margin-bottom: 20px;
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 36px;
+        line-height: 1.15;
+        margin: 0 0 10px;
+      }
+      .sub {
+        color: #455461;
+        font-size: 20px;
+        line-height: 1.5;
+        margin: 0 0 26px;
+      }
+      .surface {
+        background: white;
+        border: 2px solid #d9e1e8;
+        border-radius: 18px;
+        box-shadow: 0 12px 28px #0e2d4510;
+        overflow: hidden;
+      }
+      .progress {
+        background: #e9f1f7;
+        padding: 24px 32px;
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+      }
+      .step {
+        font-size: 19px;
+        font-weight: 700;
+      }
+      .step small {
+        display: block;
+        font-size: 15px;
+        font-weight: 500;
+        margin-top: 7px;
+      }
+      .track {
+        height: 13px;
+        background: #c7d5e1;
+        border-radius: 20px;
+        overflow: hidden;
+        flex: 1;
+        max-width: 350px;
+      }
+      .fill {
+        height: 100%;
+        width: 25%;
+        background: #2075af;
+        transition: width 0.25s;
+      }
+      .inner {
+        padding: 30px 38px 36px;
+        min-height: 450px;
+      }
+      h2 {
+        font-size: 29px;
+        margin: 0 0 15px;
+      }
+      .hint {
+        font-size: 18px;
+        line-height: 1.5;
+        color: #455461;
+        margin: 0 0 25px;
+      }
+      .fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        max-width: 730px;
+      }
+      .field label {
+        font-size: 20px;
+        font-weight: 700;
+        display: block;
+        margin: 0 0 11px;
+      }
+      .field input {
+        width: 100%;
+        border: 3px solid #57758c;
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 27px;
+        min-height: 70px;
+        color: #172b3c;
+      }
+      .under {
+        font-size: 15px;
+        margin-top: 9px;
+        color: #455461;
+      }
+      .options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        max-width: 860px;
+      }
+      .option {
+        border: 3px solid #8b9aa6;
+        background: white;
+        text-align: left;
+        padding: 22px;
+        border-radius: 13px;
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        color: #172b3c;
+      }
+      .option span.icon {
+        font-size: 35px;
+      }
+      .option b {
+        display: block;
+        font-size: 22px;
+      }
+      .option small {
+        font-size: 17px;
+        color: #425362;
+        display: block;
+        margin-top: 6px;
+      }
+      .option.selected {
+        background: #d6ebfa;
+        border-color: #126da9;
+        box-shadow: inset 0 0 0 2px #126da9;
+      }
+      .option.selected:after {
+        content: "✓";
+        margin-left: auto;
+        font-size: 31px;
+        font-weight: 700;
+        color: #075783;
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 28px;
+        border-top: 1px solid #dce4e9;
+        padding-top: 23px;
+      }
+      .primary,
+      .secondary {
+        min-height: 64px;
+        border-radius: 12px;
+        padding: 13px 28px;
+        font-size: 21px;
+        font-weight: 700;
+      }
+      .primary {
+        background: #0b5f98;
+        color: white;
+        border: 3px solid #0b5f98;
+        min-width: 230px;
+      }
+      .primary:hover {
+        background: #074a77;
+      }
+      .secondary {
+        background: white;
+        color: #17466b;
+        border: 2px solid #17466b;
+      }
+      .secondary:disabled {
+        visibility: hidden;
+      }
+      .err {
+        color: #a52222;
+        min-height: 25px;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .result {
+        border-left: 8px solid #24763d;
+        background: #eaf8ed;
+        padding: 25px;
+        border-radius: 12px;
+        max-width: 760px;
+      }
+      .amount {
+        font-size: 51px;
+        font-weight: 800;
+        color: #135f2b;
+        margin: 10px 0;
+      }
+      .result p {
+        font-size: 19px;
+        line-height: 1.5;
+      }
+      .breakdown {
+        font-size: 19px;
+        line-height: 1.8;
+        margin: 20px 0;
+        max-width: 720px;
+      }
+      footer {
+        margin: 23px 0 38px;
+        color: #556472;
+        font-size: 15px;
+        line-height: 1.4;
+      }
+      @media (max-width: 700px) {
+        header {
+          padding: 18px;
+        }
+        header strong {
+          font-size: 20px;
+        }
+        main {
+          padding: 0 12px;
+          margin: 17px auto;
+        }
+        h1 {
+          font-size: 30px;
+        }
+        .inner {
+          padding: 22px 17px;
+          min-height: 0;
+        }
+        .progress {
+          padding: 17px;
+        }
+        .fields,
+        .options {
+          grid-template-columns: 1fr;
+        }
+        .option {
+          min-height: 86px;
+        }
+        .actions {
+          flex-wrap: wrap;
+        }
+        .primary {
+          width: 100%;
+        }
+        h2 {
+          font-size: 26px;
+        }
+      }
+      @media print {
+        header,
+        .backlink,
+        .progress,
+        .actions,
+        .tag {
+          display: none !important;
+        }
+        main {
+          max-width: none;
+        }
+        .surface {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>☀ Зрозуміле вікно</strong
+      ><span class="tag">Великий текст • Прості кроки</span>
+    </header>
+    <main>
+      <a class="backlink" href="index.html">← Усі три інтерфейси</a>
+      <h1>Розрахуємо вартість вашого вікна разом</h1>
+      <p class="sub">
+        Оберіть характеристики. Ми будемо рухатися по одному кроку, без складних
+        меню.
+      </p>
+      <div class="surface">
+        <div class="progress">
+          <div class="step">
+            Крок <span id="stepNum">1</span> із 4
+            <small id="stepText">Розміри вікна</small>
+          </div>
+          <div class="track" aria-label="Прогрес">
+            <div class="fill" id="fill"></div>
+          </div>
+        </div>
+        <div class="inner">
+          <div id="content"></div>
+          <div class="err" id="error" role="alert"></div>
+          <div class="actions" id="actions">
+            <button type="button" class="secondary" id="prev">← Назад</button
+            ><button type="button" class="primary" id="next">Далі →</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>
+      const S = {
+        width: "",
+        height: "",
+        material: "",
+        glass: "",
+        install: "",
+        decor: false,
+      };
+      let step = 0;
+      const money = (n) => Math.round(n).toLocaleString("uk-UA") + " грн";
+      const rates = { pvc: 3400, wood: 6800, aluminum: 7500 };
+      const glasses = { base: 0, double: 1200, energy: 2200 };
+      const materialLabels = {
+        pvc: "ПВХ (пластикове)",
+        wood: "Дерево",
+        aluminum: "Алюміній",
+      };
+      const glassLabels = {
+        base: "Однокамерний",
+        double: "Двокамерний",
+        energy: "Енергозберігальний",
+      };
+      const byId = (id) => document.getElementById(id);
+      function buttonOption(value, icon, title, subtitle, kind) {
+        return `<button type="button" class="option ${S[kind] === value ? "selected" : ""}" data-value="${value}" data-kind="${kind}" aria-pressed="${S[kind] === value}"><span class="icon" aria-hidden="true">${icon}</span><span><b>${title}</b><small>${subtitle}</small></span></button>`;
+      }
+      function calc() {
+        let area = (S.width * S.height) / 1e6;
+        let frame = area * rates[S.material],
+          glass = area * glasses[S.glass],
+          mount = S.install === "yes" ? 900 + 350 * area : 0,
+          decor = S.decor ? 1800 : 0;
+        return {
+          area,
+          frame,
+          glass,
+          mount,
+          decor,
+          total: frame + glass + mount + decor,
+        };
+      }
+      function render() {
+        byId("stepNum").textContent = Math.min(step + 1, 4);
+        byId("stepText").textContent = [
+          "Розміри вікна",
+          "Матеріал рами",
+          "Склопакет",
+          "Монтаж та результат",
+        ][Math.min(step, 3)];
+        byId("fill").style.width = (step === 4 ? 100 : (step + 1) * 25) + "%";
+        let c = "";
+        if (step === 0)
+          c = `<h2>1. Які розміри потрібні?</h2><p class="hint">Введіть ширину та висоту в міліметрах. Наприклад, 1200 мм — це 1 метр 20 сантиметрів.</p><div class="fields"><div class="field"><label for="w">Ширина, мм</label><input id="w" type="number" min="400" max="3500" step="1" value="${S.width}" placeholder="1200"><div class="under">Від 400 до 3500 мм</div></div><div class="field"><label for="h">Висота, мм</label><input id="h" type="number" min="400" max="3000" step="1" value="${S.height}" placeholder="1400"><div class="under">Від 400 до 3000 мм</div></div></div>`;
+        if (step === 1)
+          c = `<h2>2. Оберіть матеріал рами</h2><p class="hint">Натисніть на одну велику картку. Вибраний варіант буде виділений синім кольором.</p><div class="options">${buttonOption("pvc", "▣", "Пластикове (ПВХ)", "Доступне • 3 400 грн/м²", "material")}${buttonOption("wood", "♣", "Дерев’яне", "Природний матеріал • 6 800 грн/м²", "material")}${buttonOption("aluminum", "▥", "Алюмінієве", "Міцна рама • 7 500 грн/м²", "material")}</div>`;
+        if (step === 2)
+          c = `<h2>3. Який склопакет обрати?</h2><p class="hint">Виберіть один тип скла. Додаткова вартість залежить від площі вікна.</p><div class="options">${buttonOption("base", "◻", "Однокамерний", "Без доплати", "glass")}${buttonOption("double", "▤", "Двокамерний", "+1 200 грн/м²", "glass")}${buttonOption("energy", "☼", "Енергозберігальний", "+2 200 грн/м²", "glass")}</div>`;
+        if (step === 3)
+          c = `<h2>4. Чи потрібне встановлення?</h2><p class="hint">За бажанням додайте монтаж та дизайнерське оздоблення. Після цього отримаєте підсумкову ціну.</p><div class="options">${buttonOption("yes", "✓", "Так, з монтажем", "900 грн + 350 грн/м²", "install")}${buttonOption("no", "—", "Ні, без монтажу", "Вартість тільки вікна", "install")}</div><label style="display:flex;align-items:center;gap:15px;font-size:20px;margin-top:26px;cursor:pointer"><input id="decor" type="checkbox" style="width:27px;height:27px" ${S.decor ? "checked" : ""}> Дизайнерське оздоблення (+1 800 грн)</label>`;
+        if (step === 4) {
+          let p = calc();
+          c = `<h2>Ваш розрахунок готовий!</h2><div class="result"><div>Орієнтовна загальна вартість</div><div class="amount" id="sum">${money(p.total)}</div><p>Вікно ${S.width} × ${S.height} мм • ${materialLabels[S.material]} • ${glassLabels[S.glass]} • Монтаж: ${S.install === "yes" ? "так" : "ні"}</p></div><div class="breakdown"><div>Площа: <b>${p.area.toFixed(2)} м²</b></div><div>Рама: <b>${money(p.frame)}</b></div><div>Склопакет: <b>${money(p.glass)}</b></div><div>Монтаж: <b>${money(p.mount)}</b></div><div>Оздоблення: <b>${money(p.decor)}</b></div></div><button class="secondary" id="print" type="button">🖨 Роздрукувати розрахунок</button> <button class="secondary" id="change" type="button" style="margin-left:8px">← Змінити параметри</button>`;
+        }
+        byId("content").innerHTML = c;
+        byId("error").textContent = "";
+        byId("prev").disabled = step === 0;
+        byId("next").textContent =
+          step === 3 ? "Обчислити вартість ✓" : "Далі →";
+        byId("next").style.display = step === 4 ? "none" : "";
+        byId("actions").style.display = step === 4 ? "none" : "flex";
+        byId("content")
+          .querySelectorAll(".option")
+          .forEach(
+            (el) =>
+              (el.onclick = () => {
+                S[el.dataset.kind] = el.dataset.value;
+                render();
+              }),
+          );
+        if (step === 0) {
+          byId("w").oninput = (e) => (S.width = e.target.value);
+          byId("h").oninput = (e) => (S.height = e.target.value);
+        }
+        if (step === 3)
+          byId("decor").onchange = (e) => (S.decor = e.target.checked);
+        if (step === 4) {
+          byId("print").onclick = () => window.print();
+          byId("change").onclick = () => {
+            step = 3;
+            render();
+          };
+        }
+      }
+      byId("next").onclick = () => {
+        let valid = true;
+        if (step === 0) {
+          valid =
+            Number.isInteger(+S.width) &&
+            Number.isInteger(+S.height) &&
+            S.width >= 400 &&
+            S.width <= 3500 &&
+            S.height >= 400 &&
+            S.height <= 3000;
+          if (!valid)
+            byId("error").textContent =
+              "Будь ласка, введіть коректні ширину та висоту.";
+        }
+        if (step === 1 && !S.material) {
+          valid = false;
+          byId("error").textContent = "Оберіть матеріал рами.";
+        }
+        if (step === 2 && !S.glass) {
+          valid = false;
+          byId("error").textContent = "Оберіть тип склопакета.";
+        }
+        if (step === 3 && !S.install) {
+          valid = false;
+          byId("error").textContent = "Оберіть, чи потрібен монтаж.";
+        }
+        if (valid) {
+          step++;
+          render();
+        }
+      };
+      byId("prev").onclick = () => {
+        if (step > 0) {
+          step--;
+          render();
+        }
+      };
+      render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WINDOW/GO — швидкий калькулятор</title>
+    <style>
+      :root {
+        font-family: Inter, Arial, sans-serif;
+        color: #f4f8ff;
+        background: #0e1221;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 80% 10%, #253668 0, transparent 34%),
+          radial-gradient(circle at 10% 78%, #27233e 0, transparent 40%),
+          #0e1221;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid #e6e27d;
+        outline-offset: 3px;
+      }
+      .top {
+        max-width: 1260px;
+        margin: auto;
+        padding: 27px 26px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .brand {
+        font-size: 26px;
+        font-weight: 950;
+        letter-spacing: -1px;
+      }
+      .brand span {
+        color: #b5ff69;
+      }
+      .meta {
+        font-size: 13px;
+        color: #aeb6cb;
+      }
+      .meta a {
+        color: #cbddff;
+        text-decoration: none;
+      }
+      .layout {
+        max-width: 1260px;
+        margin: 20px auto 0;
+        padding: 0 26px 35px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(310px, 0.85fr);
+        gap: 28px;
+      }
+      .eyebrow {
+        color: #b5ff69;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-weight: 800;
+        font-size: 12px;
+      }
+      .heading {
+        font-size: clamp(35px, 4vw, 56px);
+        line-height: 1.03;
+        margin: 12px 0 14px;
+        letter-spacing: -1.8px;
+      }
+      .lead {
+        font-size: 17px;
+        color: #b6bfd2;
+        line-height: 1.5;
+        max-width: 640px;
+        margin: 0 0 29px;
+      }
+      .panel {
+        background: #1a2034;
+        border: 1px solid #333e55;
+        border-radius: 22px;
+        padding: 24px;
+        margin: 18px 0;
+      }
+      .panel h2 {
+        font-size: 18px;
+        margin: 0 0 17px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .no {
+        color: #b5ff69;
+        font-weight: 800;
+        font-size: 14px;
+      }
+      .presets,
+      .choices {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .chip {
+        min-height: 48px;
+        background: #222b41;
+        border: 1.5px solid #44516a;
+        border-radius: 13px;
+        padding: 12px 17px;
+        color: #e5ecf9;
+        font-size: 14px;
+        font-weight: 700;
+        transition: transform 0.12s;
+      }
+      .chip:hover {
+        transform: translateY(-2px);
+        background: #303b56;
+      }
+      .chip.active {
+        background: #b5ff69;
+        color: #111727;
+        border-color: #b5ff69;
+      }
+      .measure {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 17px;
+      }
+      .measure label {
+        color: #aeb9cc;
+        font-size: 13px;
+        display: block;
+      }
+      .measure input {
+        margin-top: 8px;
+        width: 100%;
+        height: 48px;
+        border-radius: 12px;
+        background: #131b2d;
+        border: 1px solid #53617a;
+        color: white;
+        font-size: 18px;
+        padding: 10px 12px;
+      }
+      .toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin: 5px 0;
+      }
+      .toggle strong {
+        font-size: 16px;
+      }
+      .toggle small {
+        display: block;
+        color: #a7b1c6;
+        margin-top: 6px;
+        font-size: 13px;
+      }
+      .switch {
+        min-width: 67px;
+        height: 40px;
+        border: 1px solid #66768b;
+        border-radius: 40px;
+        background: #383e51;
+        position: relative;
+      }
+      .switch:before {
+        content: "";
+        position: absolute;
+        left: 6px;
+        top: 5px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #ced5df;
+        transition: left 0.2s;
+      }
+      .switch.on {
+        background: #b5ff69;
+        border-color: #b5ff69;
+      }
+      .switch.on:before {
+        left: 32px;
+        background: #19272a;
+      }
+      .summary {
+        position: sticky;
+        top: 22px;
+        align-self: start;
+        background: #e8f6dd;
+        border-radius: 26px;
+        padding: 29px;
+        color: #162323;
+        box-shadow: 0 25px 90px #070c1980;
+      }
+      .summary .mini {
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-weight: 800;
+        color: #556b52;
+      }
+      .summary h3 {
+        font-size: 24px;
+        letter-spacing: -0.5px;
+        margin: 7px 0 22px;
+      }
+      .window {
+        border: 8px solid #2b3c46;
+        background: linear-gradient(115deg, #e6f7fe, #94bdd7);
+        width: 88%;
+        max-width: 245px;
+        height: 206px;
+        margin: 7px auto 23px;
+        display: flex;
+        padding: 5px;
+        gap: 6px;
+        box-shadow: 15px 18px 0 #c2d5c2;
+      }
+      .pane {
+        border: 4px solid #334852;
+        flex: 1;
+        background: linear-gradient(135deg, #dff6ff, #9ec6de);
+      }
+      .pane:nth-child(2) {
+        background: linear-gradient(135deg, #a9cce1, #e7faff);
+      }
+      .data {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #c4d5c0;
+        padding: 13px 0;
+        gap: 8px;
+        font-size: 14px;
+      }
+      .data b {
+        text-align: right;
+      }
+      .amount {
+        font-size: clamp(35px, 4vw, 49px);
+        font-weight: 950;
+        letter-spacing: -2px;
+        margin: 13px 0 7px;
+      }
+      .invalid {
+        color: #a3361d;
+        font-size: 13px;
+        min-height: 34px;
+        line-height: 1.3;
+      }
+      .cta {
+        border: none;
+        border-radius: 15px;
+        padding: 16px 12px;
+        background: #162a24;
+        color: white;
+        font-size: 16px;
+        font-weight: 900;
+        width: 100%;
+        min-height: 56px;
+      }
+      .cta:hover {
+        background: #28483c;
+      }
+      .ready {
+        margin-top: 13px;
+        padding: 13px;
+        border-radius: 12px;
+        background: white;
+        font-size: 14px;
+        line-height: 1.5;
+        display: none;
+      }
+      .ready.show {
+        display: block;
+      }
+      .note {
+        font-size: 13px;
+        color: #53614e;
+        line-height: 1.5;
+        margin: 16px 0 0;
+      }
+      footer {
+        max-width: 1260px;
+        margin: auto;
+        padding: 0 26px 26px;
+        color: #8b95ad;
+        font-size: 12px;
+      }
+      @media (max-width: 800px) {
+        .layout {
+          display: block;
+        }
+        .summary {
+          position: relative;
+          top: 0;
+        }
+        .top {
+          padding: 19px 16px;
+        }
+        .layout {
+          padding: 0 16px 25px;
+        }
+        .panel {
+          padding: 18px;
+        }
+      }
+      @media print {
+        .top,
+        .panel,
+        .cta,
+        footer {
+          display: none;
+        }
+        .layout {
+          display: block;
+        }
+        .summary {
+          width: 100%;
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top">
+      <div class="brand">WINDOW<span>/GO</span></div>
+      <div class="meta">
+        Швидко. Усе на одному екрані. ·
+        <a href="index.html">← Три інтерфейси</a>
+      </div>
+    </div>
+    <div class="layout">
+      <section>
+        <div class="eyebrow">FAST CONFIGURATION // 01</div>
+        <h1 class="heading">Нове вікно.<br />Твій формат.</h1>
+        <p class="lead">
+          Тапай готові розміри, комбінуй матеріали, дивись ціну в реальному
+          часі. Ніяких довгих форм.
+        </p>
+        <div class="panel">
+          <h2><span class="no">01 /</span> Розмір</h2>
+          <div class="presets" id="presets">
+            <button type="button" class="chip" data-w="1200" data-h="1400">
+              120 × 140 см</button
+            ><button type="button" class="chip" data-w="1400" data-h="1400">
+              140 × 140 см</button
+            ><button type="button" class="chip" data-w="1800" data-h="1500">
+              180 × 150 см
+            </button>
+          </div>
+          <div class="measure">
+            <label for="width"
+              >Ширина, мм<input
+                id="width"
+                type="number"
+                min="400"
+                max="3500"
+                placeholder="1200" /></label
+            ><label for="height"
+              >Висота, мм<input
+                id="height"
+                type="number"
+                min="400"
+                max="3000"
+                placeholder="1400"
+            /></label>
+          </div>
+        </div>
+        <div class="panel">
+          <h2><span class="no">02 /</span> Матеріал</h2>
+          <div class="choices" id="materials">
+            <button type="button" class="chip" data-value="pvc">
+              ПВХ · 3 400 ₴/м²</button
+            ><button type="button" class="chip" data-value="wood">
+              Дерево · 6 800 ₴/м²</button
+            ><button type="button" class="chip" data-value="aluminum">
+              Алюміній · 7 500 ₴/м²
+            </button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2><span class="no">03 /</span> Склопакет</h2>
+          <div class="choices" id="glasses">
+            <button type="button" class="chip" data-value="base">
+              Однокамерний</button
+            ><button type="button" class="chip" data-value="double">
+              Двокамерний</button
+            ><button type="button" class="chip" data-value="energy">
+              Енергозберігальний
+            </button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2><span class="no">04 /</span> Додатково</h2>
+          <div class="toggle">
+            <div>
+              <strong>Монтаж</strong><small>900 грн + 350 грн/м²</small>
+            </div>
+            <button
+              class="switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Монтаж"
+              id="install"
+            ></button>
+          </div>
+          <hr
+            style="border: 0; border-top: 1px solid #3f4860; margin: 19px 0"
+          />
+          <div class="toggle">
+            <div>
+              <strong>Дизайнерське оздоблення</strong><small>+1 800 грн</small>
+            </div>
+            <button
+              class="switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Дизайнерське оздоблення"
+              id="decor"
+            ></button>
+          </div>
+        </div>
+      </section>
+      <aside class="summary">
+        <div class="mini">live estimate</div>
+        <h3>Твій кошторис</h3>
+        <div class="window" aria-label="Схематичне зображення вікна">
+          <div class="pane"></div>
+          <div class="pane"></div>
+        </div>
+        <div class="data">
+          <span>Розміри</span><b id="measure">Не вибрано</b>
+        </div>
+        <div class="data">
+          <span>Матеріал</span><b id="matName">Не вибрано</b>
+        </div>
+        <div class="data">
+          <span>Склопакет</span><b id="glassName">Не вибрано</b>
+        </div>
+        <div class="data"><span>Монтаж</span><b id="instName">Ні</b></div>
+        <div class="mini" style="margin-top: 21px">Орієнтовна сума</div>
+        <div class="amount" id="total">—</div>
+        <div class="invalid" id="error" role="alert">
+          Обери розміри, матеріал і склопакет.
+        </div>
+        <button class="cta" type="button" id="calculate">
+          Сформувати кошторис ↗
+        </button>
+        <div class="ready" id="ready" aria-live="polite"></div>
+      </aside>
+    </div>
+    <script>
+      const S = {
+        width: "",
+        height: "",
+        material: "",
+        glass: "",
+        install: false,
+        decor: false,
+      };
+      const mats = { pvc: 3400, wood: 6800, aluminum: 7500 };
+      const glasses = { base: 0, double: 1200, energy: 2200 };
+      const M = { pvc: "ПВХ", wood: "Дерево", aluminum: "Алюміній" },
+        G = {
+          base: "Однокамерний",
+          double: "Двокамерний",
+          energy: "Енергозберігальний",
+        };
+      const $ = (id) => document.getElementById(id);
+      const money = (n) => Math.round(n).toLocaleString("uk-UA") + " грн";
+      function calc() {
+        let area = (S.width * S.height) / 1e6;
+        let frame = area * mats[S.material],
+          glass = area * glasses[S.glass],
+          install = S.install ? 900 + 350 * area : 0,
+          decor = S.decor ? 1800 : 0;
+        return {
+          area,
+          frame,
+          glass,
+          install,
+          decor,
+          total: frame + glass + install + decor,
+        };
+      }
+      function valid() {
+        return (
+          Number.isInteger(+S.width) &&
+          Number.isInteger(+S.height) &&
+          S.width >= 400 &&
+          S.width <= 3500 &&
+          S.height >= 400 &&
+          S.height <= 3000 &&
+          !!S.material &&
+          !!S.glass
+        );
+      }
+      function update() {
+        const v = valid();
+        $("measure").textContent =
+          S.width && S.height ? `${S.width} × ${S.height} мм` : "Не вибрано";
+        $("matName").textContent = M[S.material] || "Не вибрано";
+        $("glassName").textContent = G[S.glass] || "Не вибрано";
+        $("instName").textContent = S.install ? "Так" : "Ні";
+        $("total").textContent = v ? money(calc().total) : "—";
+        $("error").textContent = v
+          ? "Готово до збереження."
+          : "Обери розміри (400–3500 × 400–3000 мм), матеріал і склопакет.";
+        $("ready").classList.remove("show");
+      }
+      function select(group, key) {
+        document.querySelectorAll("#" + group + " .chip").forEach((btn) => {
+          btn.onclick = () => {
+            S[key] = btn.dataset.value;
+            document.querySelectorAll("#" + group + " .chip").forEach((b) => {
+              b.classList.toggle("active", b === btn);
+              b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+            });
+            update();
+          };
+        });
+      }
+      select("materials", "material");
+      select("glasses", "glass");
+      document.querySelectorAll("#presets .chip").forEach(
+        (btn) =>
+          (btn.onclick = () => {
+            S.width = +btn.dataset.w;
+            S.height = +btn.dataset.h;
+            $("width").value = S.width;
+            $("height").value = S.height;
+            document
+              .querySelectorAll("#presets .chip")
+              .forEach((b) => b.classList.toggle("active", b === btn));
+            update();
+          }),
+      );
+      ["width", "height"].forEach((id) =>
+        $(id).addEventListener("input", (e) => {
+          S[id] = e.target.value;
+          document
+            .querySelectorAll("#presets .chip")
+            .forEach((b) =>
+              b.classList.toggle(
+                "active",
+                +b.dataset.w === +S.width && +b.dataset.h === +S.height,
+              ),
+            );
+          update();
+        }),
+      );
+      ["install", "decor"].forEach(
+        (id) =>
+          ($(id).onclick = () => {
+            S[id] = !S[id];
+            $(id).classList.toggle("on", S[id]);
+            $(id).setAttribute("aria-checked", String(S[id]));
+            update();
+          }),
+      );
+      $("calculate").onclick = () => {
+        if (!valid()) {
+          $("error").textContent = "Спочатку заповни обов’язкові параметри.";
+          return;
+        }
+        const p = calc();
+        $("ready").innerHTML =
+          `<b>Кошторис сформовано ✓</b><br>${S.width} × ${S.height} мм • ${M[S.material]} • ${G[S.glass]}<br>Рама ${money(p.frame)} + скло ${money(p.glass)} + монтаж ${money(p.install)} + декор ${money(p.decor)}<br><strong>Разом ${money(p.total)}</strong><br><button type="button" onclick="window.print()" style="margin-top:9px;padding:8px 13px;border:1px solid #344;color:#123;border-radius:7px;background:#f4f8f4;cursor:pointer">Друкувати / PDF</button>`;
+        $("ready").classList.add("show");
+      };
+      update();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ATELIER · Створіть власне вікно</title>
+    <style>
+      :root {
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #292924;
+        background: #f3efe8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid #b5904a;
+        outline-offset: 4px;
+      }
+      .navbar {
+        background: #202521;
+        color: #ede9df;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 23px 6%;
+      }
+      .logo {
+        font-size: 26px;
+        letter-spacing: 5px;
+        font-family: Georgia, serif;
+      }
+      .navright {
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #c7c1b5;
+      }
+      .navright a {
+        color: #d9c48f;
+        text-decoration: none;
+      }
+      .section {
+        display: grid;
+        grid-template-columns: minmax(340px, 1fr) minmax(430px, 1fr);
+        min-height: 650px;
+      }
+      .showroom {
+        background: linear-gradient(145deg, #e9e5dc, #cbc8bd);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 28px 35px 55px;
+      }
+      .showroom:before {
+        content: "";
+        position: absolute;
+        bottom: 13%;
+        left: 0;
+        width: 100%;
+        height: 15%;
+        background: #c0b9aa80;
+        transform: skewY(-3deg);
+      }
+      .overline {
+        align-self: flex-start;
+        font-size: 12px;
+        letter-spacing: 3px;
+        color: #5b5b51;
+        z-index: 1;
+      }
+      .art {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        min-height: 330px;
+        position: relative;
+        z-index: 1;
+      }
+      .window {
+        width: min(70%, 390px);
+        height: 330px;
+        display: flex;
+        gap: 10px;
+        padding: 13px;
+        border: 14px solid #62645e;
+        background: #51534b;
+        box-shadow:
+          20px 24px 45px #77776899,
+          inset 1px 1px 3px #222;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+      .window.wood {
+        border-color: #9b6940;
+        background: #7b5030;
+      }
+      .window.pvc {
+        border-color: #f9f5e8;
+        background: #ddd7c6;
+      }
+      .window.aluminum {
+        border-color: #3e4850;
+        background: #2a323a;
+      }
+      .pane {
+        flex: 1;
+        background: linear-gradient(
+          135deg,
+          #bed3d9 0%,
+          #eaf3f2 34%,
+          #a8c5ce 35%,
+          #d5e6e8 100%
+        );
+        border: 5px solid #d9e3e2;
+        position: relative;
+      }
+      .pane:after {
+        content: "";
+        position: absolute;
+        right: 12px;
+        top: 7px;
+        width: 2px;
+        height: 88%;
+        background: #ffffff88;
+        transform: rotate(11deg);
+      }
+      .window.wood .pane {
+        border-color: #845b3f;
+      }
+      .window.aluminum .pane {
+        border-color: #56656a;
+      }
+      .window.pvc .pane {
+        border-color: #e6e4d9;
+      }
+      .showroomlabel {
+        position: relative;
+        z-index: 1;
+        align-self: flex-start;
+      }
+      .showroomlabel h2 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        font-size: 38px;
+        line-height: 1.12;
+        margin: 0 0 11px;
+      }
+      .showroomlabel p {
+        font-size: 13px;
+        letter-spacing: 1px;
+        color: #59584f;
+        margin: 0;
+      }
+      .right {
+        padding: 42px clamp(32px, 4vw, 75px) 45px;
+        background: #f9f7f2;
+      }
+      .micro {
+        font-size: 11px;
+        letter-spacing: 3px;
+        font-weight: 700;
+        color: #9a7a46;
+        text-transform: uppercase;
+      }
+      .headline {
+        font-family: Georgia, serif;
+        font-size: clamp(30px, 3.2vw, 44px);
+        line-height: 1.13;
+        font-weight: 400;
+        margin: 13px 0 22px;
+      }
+      .steps {
+        display: flex;
+        gap: 6px;
+        margin: 0 0 28px;
+      }
+      .step {
+        height: 5px;
+        flex: 1;
+        background: #d6d3cb;
+        border-radius: 4px;
+      }
+      .step.active {
+        background: #af8b4c;
+      }
+      .step.past {
+        background: #66745e;
+      }
+      .desc {
+        font-size: 15px;
+        color: #646459;
+        line-height: 1.55;
+        margin: -7px 0 20px;
+      }
+      .choicegrid {
+        display: grid;
+        gap: 12px;
+      }
+      .choice {
+        background: #fff;
+        border: 1px solid #d3cdc1;
+        border-radius: 2px;
+        text-align: left;
+        padding: 17px 17px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        color: #34362e;
+        min-height: 73px;
+      }
+      .choice:hover {
+        border-color: #a58c5c;
+      }
+      .choice.selected {
+        border: 2px solid #a9813a;
+        background: #f8f0e0;
+        padding: 16px;
+      }
+      .choice b {
+        display: block;
+        font-size: 18px;
+        font-family: Georgia, serif;
+        font-weight: 400;
+      }
+      .choice small {
+        color: #79776a;
+        font-size: 13px;
+        display: block;
+        margin-top: 4px;
+      }
+      .choice .price {
+        color: #a47c3e;
+        white-space: nowrap;
+        font-size: 13px;
+      }
+      .choice.selected .price:after {
+        content: " ✓";
+        font-size: 18px;
+      }
+      .fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 19px 0 0;
+      }
+      .fields label {
+        font-size: 13px;
+        color: #6f6a5f;
+      }
+      .fields input {
+        display: block;
+        width: 100%;
+        border: 1px solid #bfb9ac;
+        background: white;
+        min-height: 47px;
+        padding: 10px;
+        margin-top: 8px;
+        color: #34362e;
+      }
+      .extra {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #ded9ce;
+        gap: 15px;
+        padding: 17px 0;
+      }
+      .extra label {
+        font-size: 16px;
+      }
+      .extra small {
+        display: block;
+        color: #777165;
+        margin-top: 5px;
+        font-size: 12px;
+      }
+      .extra input {
+        width: 22px;
+        height: 22px;
+        accent-color: #8c6a31;
+        cursor: pointer;
+      }
+      .bar {
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .back,
+      .next {
+        padding: 15px 18px;
+        border: 1px solid #96896f;
+        border-radius: 2px;
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        font-weight: 750;
+        min-height: 55px;
+      }
+      .back {
+        background: transparent;
+        color: #595447;
+      }
+      .next {
+        background: #252c26;
+        color: white;
+        flex: 1;
+        max-width: 280px;
+        border-color: #252c26;
+      }
+      .back:disabled {
+        visibility: hidden;
+      }
+      .next:hover {
+        background: #39463a;
+      }
+      .error {
+        color: #a12020;
+        font-size: 13px;
+        min-height: 20px;
+        margin-top: 8px;
+      }
+      .pricebox {
+        border-top: 1px solid #cbbfa8;
+        border-bottom: 1px solid #cbbfa8;
+        padding: 19px 0;
+        margin: 20px 0;
+      }
+      .pricebox small {
+        color: #766e60;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      .pricebox strong {
+        font-size: 48px;
+        font-family: Georgia, serif;
+        font-weight: 400;
+        display: block;
+        margin: 5px 0;
+      }
+      .breakdown {
+        color: #605c52;
+        font-size: 14px;
+        line-height: 2;
+      }
+      .breakdown b {
+        color: #292924;
+      }
+      .fade {
+        animation: fade 0.2s ease-in;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0.4;
+          transform: translateY(3px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .smallprint {
+        font-size: 12px;
+        line-height: 1.55;
+        color: #767064;
+        margin-top: 30px;
+      }
+      .foot {
+        padding: 22px 6%;
+        background: #202521;
+        color: #a8aa9f;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+      }
+      @media (max-width: 850px) {
+        .section {
+          grid-template-columns: 1fr;
+        }
+        .showroom {
+          min-height: 350px;
+          padding: 22px;
+        }
+        .art {
+          min-height: 200px;
+        }
+        .window {
+          height: 205px;
+          width: 230px;
+          border-width: 9px;
+          padding: 6px;
+        }
+        .showroomlabel h2 {
+          font-size: 27px;
+        }
+        .right {
+          padding: 28px 23px;
+        }
+        .foot {
+          flex-wrap: wrap;
+        }
+      }
+      @media print {
+        .navbar,
+        .foot,
+        .steps,
+        .bar,
+        .smallprint {
+          display: none;
+        }
+        .section {
+          display: block;
+        }
+        .showroom {
+          min-height: 200px;
+          max-height: 260px;
+        }
+        .art {
+          min-height: 0;
+        }
+        .window {
+          width: 120px;
+          height: 110px;
+        }
+        .right {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">ATELIER</div>
+      <div class="navright">
+        WINDOW STUDIO &nbsp; | &nbsp; <a href="index.html">Усі версії ↗</a>
+      </div>
+    </nav>
+    <div class="section">
+      <section class="showroom">
+        <div class="overline">СТУДІЯ ПРЕМІАЛЬНИХ ВІКОН / КОЛЕКЦІЯ 2026</div>
+        <div class="art">
+          <div class="window" id="window">
+            <div class="pane"></div>
+            <div class="pane"></div>
+          </div>
+        </div>
+        <div class="showroomlabel">
+          <h2>Архітектура світла.</h2>
+          <p id="previewlabel">
+            Індивідуальний добір матеріалу, скла та монтажу
+          </p>
+        </div>
+      </section>
+      <section class="right">
+        <div class="micro" id="chapter">01 / ГАБАРИТИ</div>
+        <h1 class="headline" id="headline">
+          Кожна деталь починається з пропорцій.
+        </h1>
+        <div class="steps" id="steps">
+          <i class="step active"></i><i class="step"></i><i class="step"></i
+          ><i class="step"></i>
+        </div>
+        <div class="fade" id="screen"></div>
+        <div class="error" id="error" role="alert"></div>
+        <div class="bar">
+          <button type="button" class="back" id="back">← Назад</button
+          ><button type="button" class="next" id="next">Продовжити →</button>
+        </div>
+      </section>
+    </div>
+    <script>
+      const S = {
+          width: "",
+          height: "",
+          material: "",
+          glass: "",
+          install: false,
+          decor: false,
+        },
+        mat = { pvc: 3400, wood: 6800, aluminum: 7500 },
+        gl = { base: 0, double: 1200, energy: 2200 };
+      let step = 0;
+      const $ = (id) => document.getElementById(id);
+      const money = (n) => Math.round(n).toLocaleString("uk-UA") + " грн";
+      const labels = {
+          pvc: "Сучасний ПВХ",
+          wood: "Натуральне дерево",
+          aluminum: "Архітектурний алюміній",
+        },
+        glabels = {
+          base: "Однокамерний",
+          double: "Двокамерний",
+          energy: "Енергозберігальний",
+        };
+      function rate() {
+        const area = (S.width * S.height) / 1e6,
+          frame = area * mat[S.material],
+          glass = area * gl[S.glass],
+          install = S.install ? 900 + 350 * area : 0,
+          decor = S.decor ? 1800 : 0;
+        return {
+          area,
+          frame,
+          glass,
+          install,
+          decor,
+          total: frame + glass + install + decor,
+        };
+      }
+
+      function updateWindowProportions() {
+        const preview = $("window");
+        const art = preview.parentElement;
+        const w = Number(S.width);
+        const h = Number(S.height);
+
+        if (!(w > 0 && h > 0)) {
+          preview.style.removeProperty("width");
+          preview.style.removeProperty("height");
+          preview.style.removeProperty("box-sizing");
+          return;
+        }
+
+        const maxWidth = Math.min(490, art.clientWidth * 0.86);
+        const maxHeight = Math.min(415, art.clientHeight * 0.82);
+        const scale = Math.min(maxWidth / w, maxHeight / h);
+
+        preview.style.boxSizing = "border-box";
+        preview.style.width = `${Math.round(w * scale)}px`;
+        preview.style.height = `${Math.round(h * scale)}px`;
+      }
+
+      function pick(name, key, description, detail) {
+        return `<button type="button" class="choice ${S[key] === name ? "selected" : ""}" data-key="${key}" data-val="${name}" aria-pressed="${S[key] === name}"><div><b>${description}</b><small>${detail}</small></div><div class="price">${key === "material" ? money(mat[name]) + "/м²" : name === "base" ? "Без доплати" : money(gl[name]) + "/м²"}</div></button>`;
+      }
+      function render() {
+        let chapters = [
+          "01 / ГАБАРИТИ",
+          "02 / КОЛЕКЦІЯ",
+          "03 / ОСНАЩЕННЯ",
+          "04 / ВАША ПРОПОЗИЦІЯ",
+        ];
+        let headers = [
+          "Кожна деталь починається з пропорцій.",
+          "Матеріал, який створює атмосферу.",
+          "Комфорт — у продуманих деталях.",
+          "Ваша персональна конфігурація.",
+        ];
+        $("chapter").textContent = chapters[step];
+        $("headline").textContent = headers[step];
+        document
+          .querySelectorAll(".step")
+          .forEach(
+            (el, i) =>
+              (el.className =
+                "step " + (i === step ? "active" : i < step ? "past" : "")),
+          );
+        $("error").textContent = "";
+        $("back").disabled = step === 0;
+        $("next").textContent =
+          step === 2
+            ? "Отримати пропозицію →"
+            : step === 3
+              ? "Друкувати пропозицію"
+              : "Продовжити →";
+        $("previewlabel").textContent =
+          (labels[S.material] || "Оберіть матеріал") +
+          " · " +
+          (S.width && S.height
+            ? S.width + " × " + S.height + " мм"
+            : "індивідуальний розмір");
+        $("window").className = "window " + (S.material || "");
+        updateWindowProportions();
+        let html = "";
+        if (step === 0)
+          html = `<p class="desc">Визначте розмір конструкції. Оберіть архітектурний формат або введіть власні значення.</p><div class="choicegrid"><button class="choice preset ${S.width == 1200 && S.height == 1400 ? "selected" : ""}" data-w="1200" data-h="1400"><div><b>Класичний</b><small>1200 × 1400 мм</small></div><span class="price">Для житлової кімнати</span></button><button class="choice preset ${S.width == 1800 && S.height == 1500 ? "selected" : ""}" data-w="1800" data-h="1500"><div><b>Просторий</b><small>1800 × 1500 мм</small></div><span class="price">Більше природного світла</span></button><button class="choice preset ${S.width == 2400 && S.height == 2200 ? "selected" : ""}" data-w="2400" data-h="2200"><div><b>Панорамний</b><small>2400 × 2200 мм</small></div><span class="price">Архітектурний акцент</span></button></div><div class="fields"><label for="width">Ширина, мм<input id="width" type="number" min="400" max="3500" value="${S.width}" placeholder="1200"></label><label for="height">Висота, мм<input id="height" type="number" min="400" max="3000" value="${S.height}" placeholder="1400"></label></div>`;
+        if (step === 1)
+          html = `<p class="desc">Три матеріали з різним характером і ціною. Обрана поверхня відобразиться в ескізі ліворуч.</p><div class="choicegrid">${pick("wood", "material", "Натуральне дерево", "Тепла фактура та затишок")}${pick("aluminum", "material", "Архітектурний алюміній", "Стриманий сучасний дизайн")}${pick("pvc", "material", "ПВХ", "Практичний і доступний профіль")}</div>`;
+        if (step === 2)
+          html = `<p class="desc">Збалансуйте теплоізоляцію, вартість та сервіс. Можна обрати декілька додаткових послуг.</p><div class="choicegrid">${pick("base", "glass", "Однокамерний", "Стандартний базовий комплект")}${pick("double", "glass", "Двокамерний", "Покращена тепло- та звукоізоляція")}${pick("energy", "glass", "Енергозберігальний", "Додаткові теплоізоляційні властивості")}</div><div class="extra"><label for="install">Професійний монтаж<small>900 грн + 350 грн/м²</small></label><input id="install" type="checkbox" ${S.install ? "checked" : ""}></div><div class="extra"><label for="decor">Дизайнерське оздоблення<small>Фіксована доплата 1 800 грн</small></label><input id="decor" type="checkbox" ${S.decor ? "checked" : ""}></div>`;
+        if (step === 3) {
+          let p = rate();
+          html = `<p class="desc">Фінальна орієнтовна оцінка обраного рішення. Дані можна роздрукувати або зберегти як PDF у вікні друку.</p><div class="pricebox"><small>Розрахована вартість</small><strong id="total">${money(p.total)}</strong><span>${S.width} × ${S.height} мм · ${labels[S.material]} · ${glabels[S.glass]}</span></div><div class="breakdown"><div>Площа: <b>${p.area.toFixed(2)} м²</b></div><div>Матеріал рами: <b>${money(p.frame)}</b></div><div>Склопакет: <b>${money(p.glass)}</b></div><div>Монтаж: <b>${money(p.install)}</b></div><div>Декор: <b>${money(p.decor)}</b></div></div>`;
+        }
+        $("screen").innerHTML = html;
+        document.querySelectorAll("[data-key]").forEach(
+          (b) =>
+            (b.onclick = () => {
+              S[b.dataset.key] = b.dataset.val;
+              render();
+            }),
+        );
+        document.querySelectorAll(".preset").forEach(
+          (b) =>
+            (b.onclick = () => {
+              S.width = +b.dataset.w;
+              S.height = +b.dataset.h;
+              render();
+            }),
+        );
+        if (step === 0) {
+          ["width", "height"].forEach(
+            (id) =>
+              ($(id).oninput = (e) => {
+                S[id] = e.target.value;
+                updateWindowProportions();
+                document
+                  .querySelectorAll(".preset")
+                  .forEach((b) =>
+                    b.classList.toggle(
+                      "selected",
+                      +b.dataset.w === +S.width && +b.dataset.h === +S.height,
+                    ),
+                  );
+                $("previewlabel").textContent =
+                  (labels[S.material] || "Оберіть матеріал") +
+                  " · " +
+                  (S.width && S.height
+                    ? S.width + " × " + S.height + " мм"
+                    : "індивідуальний розмір");
+              }),
+          );
+        }
+        if (step === 2) {
+          ["install", "decor"].forEach(
+            (id) => ($(id).onchange = (e) => (S[id] = e.target.checked)),
+          );
+        }
+      }
+      $("next").onclick = () => {
+        if (step === 3) {
+          window.print();
+          return;
+        }
+        if (
+          step === 0 &&
+          !(
+            Number.isInteger(+S.width) &&
+            Number.isInteger(+S.height) &&
+            S.width >= 400 &&
+            S.width <= 3500 &&
+            S.height >= 400 &&
+            S.height <= 3000
+          )
+        ) {
+          $("error").textContent =
+            "Оберіть правильні розміри: 400–3500 × 400–3000 мм.";
+          return;
+        }
+        if (step === 1 && !S.material) {
+          $("error").textContent = "Оберіть матеріал рами.";
+          return;
+        }
+        if (step === 2 && !S.glass) {
+          $("error").textContent = "Оберіть склопакет.";
+          return;
+        }
+        step++;
+        render();
+      };
+      $("back").onclick = () => {
+        step = Math.max(step - 1, 0);
+        render();
+      };
+      render();
+      window.addEventListener("resize", updateWindowProportions);
+    </script>
+  </body>
+</html>
